@@ -1,20 +1,83 @@
 {% extends 'base.html' %}
 {% block title %}Мои записи — Электронная запись к врачу{% endblock %}
+
 {% block content %}
 <section class="dashboard page-shell">
-  <div class="dashboard-heading"><div><p class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</p><h1>Мои записи<span>.</span></h1><p>Все ваши предстоящие и прошедшие приёмы — в одном месте.</p></div><a class="button button-primary" href="{% url 'schedule' %}#appointments"><i class="bi bi-plus-lg"></i> Новая запись</a></div>
+  <div class="dashboard-heading">
+    <div>
+      <p class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</p>
+      <h1>Мои записи<span>.</span></h1>
+      <p>Все ваши предстоящие и прошедшие приёмы — в одном месте.</p>
+    </div>
+    <a class="button button-primary" href="{% url 'schedule' %}#appointments">
+      <i class="bi bi-plus-lg"></i> Новая запись
+    </a>
+  </div>
+
   {% if appointments %}
     <div class="appointment-list">
     {% for a in appointments %}
-      <article class="my-appointment-card {% if a.status == 'cancelled' %}is-cancelled{% endif %}">
-        <div class="date-tile"><span>{{ a.schedule.date|date:'d' }}</span><small>{{ a.schedule.date|date:'M' }}</small></div>
-        <div class="my-appointment-main"><span class="doctor-specialty">{{ a.schedule.doctor.specialization }}</span><h2>{{ a.schedule.doctor.name }}</h2><div class="appointment-meta inline-meta"><span><i class="bi bi-calendar3"></i> {{ a.schedule.date|date:'d.m.Y' }}</span><span><i class="bi bi-clock"></i> {{ a.schedule.time|time:'H:i' }}</span></div></div>
-        <div class="appointment-controls">{% if a.status == 'pending' %}<span class="status-pill status-pending"><i class="bi bi-hourglass-split"></i> Ожидает подтверждения</span>{% elif a.status == 'confirmed' %}<span class="status-pill status-confirmed"><i class="bi bi-check-circle"></i> Подтверждена</span>{% else %}<span class="status-pill status-cancelled"><i class="bi bi-x-circle"></i> Отменена</span>{% endif %}{% if a.status != 'cancelled' %}<a href="{% url 'cancel_appointment' a.id %}" class="cancel-link" onclick="return confirm('Вы уверены, что хотите отменить запись?');">Отменить запись</a>{% endif %}</div>
+      <article class="my-appointment-card {% if a.status == 'cancelled' or a.status == 'completed' %}is-cancelled{% endif %}">
+        
+        <!-- Дата и время -->
+        <div class="date-tile">
+          <span>{{ a.schedule.date|date:'d' }}</span>
+          <small>{{ a.schedule.date|date:'M' }}</small>
+        </div>
+        
+        <!-- Информация о враче -->
+        <div class="my-appointment-main">
+          <span class="doctor-specialty">{{ a.schedule.doctor.specialization }}</span>
+          <h2>{{ a.schedule.doctor.name }}</h2>
+          <div class="appointment-meta inline-meta">
+            <span><i class="bi bi-calendar3"></i> {{ a.schedule.date|date:'d.m.Y' }}</span>
+            <span><i class="bi bi-clock"></i> {{ a.schedule.time|time:'H:i' }}</span>
+          </div>
+        </div>
+        
+        <!-- Статус и кнопка отмены -->
+        <div class="appointment-controls">
+          
+          <!-- 1. Отображение статуса -->
+          {% if a.status == 'pending' %}
+            <span class="status-pill status-pending">
+              <i class="bi bi-hourglass-split"></i> Ожидает
+            </span>
+          {% elif a.status == 'confirmed' %}
+            <span class="status-pill status-confirmed">
+              <i class="bi bi-check-circle"></i> Подтверждена
+            </span>
+          {% elif a.status == 'cancelled' %}
+            <span class="status-pill status-cancelled">
+              <i class="bi bi-x-circle"></i> Отменена
+            </span>
+          {% elif a.status == 'completed' %}
+            <span class="status-pill" style="background:#e2f7ec; color:#08734e;">
+              <i class="bi bi-check2-circle"></i> Завершена
+            </span>
+          {% endif %}
+
+          <!-- 2. Кнопка отмены (показывается ТОЛЬКО для активных записей) -->
+          {% if a.status == 'pending' or a.status == 'confirmed' %}
+            <a href="{% url 'cancel_appointment' a.id %}" class="cancel-link" onclick="return confirm('Вы уверены, что хотите отменить запись?');">
+              <i class="bi bi-x-circle"></i> Отменить запись
+            </a>
+          {% endif %}
+          
+        </div>
       </article>
     {% endfor %}
     </div>
+
   {% else %}
-    <div class="empty-state dashboard-empty"><span class="empty-icon"><i class="bi bi-calendar2-heart"></i></span><h2>Пока нет записей</h2><p>Когда вы запишетесь к специалисту, информация появится здесь.</p><a href="{% url 'schedule' %}#appointments" class="button button-primary">Выбрать врача <i class="bi bi-arrow-right"></i></a></div>
+    <div class="empty-state dashboard-empty">
+      <span class="empty-icon"><i class="bi bi-calendar2-heart"></i></span>
+      <h2>Пока нет записей</h2>
+      <p>Когда вы запишетесь к специалисту, информация появится здесь.</p>
+      <a href="{% url 'schedule' %}#appointments" class="button button-primary">
+        Выбрать врача <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
   {% endif %}
 </section>
 {% endblock %}

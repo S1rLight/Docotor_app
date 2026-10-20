@@ -32,6 +32,7 @@ class Appointment(models.Model):
         ('pending', 'Ожидает'),
         ('confirmed', 'Подтверждена'),
         ('cancelled', 'Отменена'),
+        ('completed', 'Завершена'),
     ]
     patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="appointments")
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
