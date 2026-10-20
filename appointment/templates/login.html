@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Вход — Электронная запись к врачу{% endblock %}
+{% block content %}
+<section class="auth-layout page-shell">
+  <div class="auth-visual auth-visual-forest"><div class="auth-visual-content"><span class="auth-mark"><i class="bi bi-heart-pulse-fill"></i></span><p class="eyebrow eyebrow-light">ЗАБОТА РЯДОМ</p><h1>Ваше здоровье<br>начинается здесь.</h1><p>Войдите, чтобы управлять записями и не пропускать важные приёмы.</p></div></div>
+  <div class="auth-panel"><div class="auth-heading"><p class="eyebrow">С ВОЗВРАЩЕНИЕМ</p><h2>Войти в аккаунт</h2><p>Введите данные, указанные при регистрации.</p></div>
+    {% if form.errors %}<div class="form-alert"><i class="bi bi-exclamation-circle"></i> Неверный логин или пароль. Попробуйте ещё раз.</div>{% endif %}
+    <form method="post" class="styled-form" novalidate>{% csrf_token %}
+      {% for field in form %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<ul class="errorlist">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}</div>{% endfor %}
+      <button type="submit" class="button button-primary button-large form-submit">Войти <i class="bi bi-arrow-right"></i></button>
+    </form>
+    <p class="auth-switch" style="margin-bottom: 8px;">
+        <a href="{% url 'password_reset' %}" style="color: var(--primary-color, #2563eb); font-size: 0.9rem; text-decoration: none;">
+            Забыли пароль?
+        </a>
+    </p>
+    <p class="auth-switch">Впервые здесь? <a href="{% url 'register' %}">Создать аккаунт</a></p>
+  </div>
+</section>
+{% endblock %}

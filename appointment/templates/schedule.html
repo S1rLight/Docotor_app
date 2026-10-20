@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Главная — Электронная запись к врачу{% endblock %}
+{% block body_class %}home-page{% endblock %}
+{% block header_class %}header-overlay{% endblock %}
+{% block content %}
+<section class="hero-forest">
+  <div class="hero-shade"></div>
+  <div class="hero-content page-shell">
+    <p class="eyebrow eyebrow-light">ВАШЕ ЗДОРОВЬЕ — НАШ ПРИОРИТЕТ</p>
+    <h1>Запишитесь к врачу.<br><span>Без лишнего ожидания.</span></h1>
+    <p class="hero-description">Удобная электронная запись, проверенные специалисты<br class="desktop-only"> и забота о вашем здоровье — в одном месте.</p>
+    <div class="hero-actions"><a class="button button-primary button-large" href="#appointments">Выбрать врача <i class="bi bi-arrow-right"></i></a><a class="text-link text-link-light" href="#how-it-works">Как это работает?</a></div>
+    <div class="forest-note">Забота<br>рядом <span>♡</span></div>
+  </div>
+  <div class="search-panel page-shell" id="appointments">
+    <div class="search-intro"><span class="search-icon"><i class="bi bi-calendar2-check"></i></span><div><strong>Найдите удобное время</strong><small>Выберите врача и подходящий приём</small></div></div>
+    <form method="get" class="schedule-filter" action="#appointments">
+      <label class="filter-field"><i class="bi bi-search"></i><span class="visually-hidden">Поиск по врачу</span><input type="search" name="q" placeholder="Врач или специализация" value="{{ request.GET.q|default:'' }}"></label>
+      <button class="button button-primary filter-submit" type="submit">Найти приём <i class="bi bi-arrow-right"></i></button>
+    </form>
+  </div>
+  <div class="feature-strip page-shell" id="how-it-works">
+    <div class="feature-item"><span class="feature-icon"><i class="bi bi-calendar-check"></i></span><div><strong>Удобная запись</strong><p>В любое время,<br>без очередей</p></div></div>
+    <div class="feature-item"><span class="feature-icon"><i class="bi bi-heart-pulse"></i></span><div><strong>Проверенные врачи</strong><p>Специалисты для<br>вашего здоровья</p></div></div>
+    <div class="feature-item"><span class="feature-icon"><i class="bi bi-shield-check"></i></span><div><strong>Ваши данные в безопасности</strong><p>Личный кабинет и<br>защита информации</p></div></div>
+    <div class="feature-item"><span class="feature-icon"><i class="bi bi-clock-history"></i></span><div><strong>Всё под контролем</strong><p>Записи и история<br>приёмов онлайн</p></div></div>
+  </div>
+</section>
+
+<section class="appointments-section page-shell">
+  <div class="section-heading"><div><p class="eyebrow">ВАШ СЛЕДУЮЩИЙ ШАГ</p><h2>Доступные приёмы</h2><p class="section-subtitle">Выберите специалиста и запишитесь на удобное время.</p></div><span class="results-count">{% if schedules %}{{ schedules|length }} доступных приёмов{% else %}Расписание{% endif %}</span></div>
+  {% if schedules %}
+  <div class="schedule-grid">
+    {% for s in schedules %}
+      <article class="appointment-card">
+        <div class="doctor-avatar"><i class="bi bi-person-badge"></i><span class="online-dot"></span></div>
+        <div class="doctor-info"><span class="doctor-specialty">{{ s.doctor.specialization }}</span><h3>{{ s.doctor.name }}</h3><p><i class="bi bi-award"></i> Стаж {{ s.doctor.experience }} лет</p></div>
+        <div class="appointment-meta"><span><i class="bi bi-calendar3"></i> {{ s.date|date:'d.m.Y' }}</span><span><i class="bi bi-clock"></i> {{ s.time|time:'H:i' }}</span></div>
+        {% if user.is_authenticated %}<a href="{% url 'make_appointment' s.id %}" class="button button-primary card-action">Записаться <i class="bi bi-arrow-up-right"></i></a>{% else %}<a href="{% url 'login' %}" class="button button-primary card-action">Войти для записи <i class="bi bi-arrow-up-right"></i></a>{% endif %}
+      </article>
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="empty-state"><span class="empty-icon"><i class="bi bi-calendar2-x"></i></span><h3>Свободных приёмов пока нет</h3><p>Попробуйте заглянуть позже — расписание обновляется.</p></div>
+  {% endif %}
+</section>
+{% endblock %}
