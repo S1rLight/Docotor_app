@@ -10,6 +10,7 @@ urlpatterns = [
     path('appointment/<int:schedule_id>/', views.make_appointment, name='make_appointment'),
     path('my-appointments/', views.my_appointments, name='my_appointments'),
     path('cancel/<int:appointment_id>/', views.cancel_appointment, name='cancel_appointment'),
+    path('doctor-cabinet/', views.doctor_dashboard, name='doctor_dashboard'),
     
     path('password_reset/', 
          auth_views.PasswordResetView.as_view(

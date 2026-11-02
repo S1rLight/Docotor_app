@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Doctor(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='doctor_profiles', verbose_name="Пользователь")  # ForeignKey вместо OneToOne
     name = models.CharField(max_length=200, verbose_name="ФИО доктора")
     specialization = models.CharField(max_length=100, verbose_name="Специализация")
     experience = models.IntegerField(verbose_name="Стаж (лет)", default=0)

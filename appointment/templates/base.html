@@ -20,14 +20,30 @@
             <span>Электронная<br>запись к врачу</span>
         </a>
         <button class="nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false"><i class="bi bi-list"></i></button>
+        
         <nav class="main-nav" aria-label="Основная навигация">
             <a class="{% if request.resolver_match.url_name == 'schedule' %}active{% endif %}" href="{% url 'schedule' %}">Главная</a>
             <a href="{% url 'schedule' %}#appointments">Врачи и приёмы</a>
-            {% if user.is_authenticated %}<a class="{% if request.resolver_match.url_name == 'my_appointments' %}active{% endif %}" href="{% url 'my_appointments' %}">Мои записи</a>{% endif %}
+            
+            {% if user.is_authenticated %}
+                {% if is_doctor %}
+                    <!-- Ссылка для врача -->
+                    <a class="{% if request.resolver_match.url_name == 'doctor_dashboard' %}active{% endif %}" href="{% url 'doctor_dashboard' %}">Кабинет врача</a>
+                {% else %}
+                    <!-- Ссылка для пациента -->
+                    <a class="{% if request.resolver_match.url_name == 'my_appointments' %}active{% endif %}" href="{% url 'my_appointments' %}">Мои записи</a>
+                {% endif %}
+            {% endif %}
         </nav>
+        
         <div class="header-actions">
             {% if user.is_authenticated %}
-                <span class="user-greeting"><i class="bi bi-person-circle"></i> {{ user.first_name|default:user.username }}</span>
+                <span class="user-greeting">
+                    <i class="bi bi-person-circle"></i> {{ user.first_name|default:user.username }}
+                    {% if is_doctor %}
+                        <span style="font-size: 0.7em; background: #e2f7ec; color: #08734e; padding: 2px 6px; border-radius: 4px; margin-left: 4px; font-weight: 600;">ВРАЧ</span>
+                    {% endif %}
+                </span>
                 <a class="button button-ghost button-small" href="{% url 'logout' %}">Выйти</a>
             {% else %}
                 <a class="button button-ghost button-small" href="{% url 'login' %}">Войти</a>
@@ -37,18 +53,31 @@
     </div>
 </header>
 
-{% if messages %}<div class="message-wrap">
-    {% for message in messages %}<div class="notice notice-{{ message.tags|default:'info' }}" role="status"><i class="bi bi-info-circle"></i><span>{{ message }}</span><button type="button" class="notice-close" aria-label="Закрыть">×</button></div>{% endfor %}
-</div>{% endif %}
+{% if messages %}
+<div class="message-wrap">
+    {% for message in messages %}
+    <div class="notice notice-{{ message.tags|default:'info' }}" role="status">
+        <i class="bi bi-info-circle"></i>
+        <span>{{ message }}</span>
+        <button type="button" class="notice-close" aria-label="Закрыть">×</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 
 <main>{% block content %}{% endblock %}</main>
+
 <footer class="site-footer">
     <div class="footer-inner">
-        <a class="brand footer-brand" href="{% url 'schedule' %}"><span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span><span>Электронная<br>запись к врачу</span></a>
+        <a class="brand footer-brand" href="{% url 'schedule' %}">
+            <span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span>
+            <span>Электронная<br>запись к врачу</span>
+        </a>
         <p>Забота о здоровье — в одном месте.</p>
         <span class="footer-copy">© 2026 Электронная запись к врачу</span>
     </div>
 </footer>
+
 <script>
 (() => {
   const toggle = document.querySelector('.nav-toggle');

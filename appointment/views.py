@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.db.models import Q
-from .models import Schedule, Appointment
+from .models import Schedule, Appointment, Doctor
 from .forms import RegistrationForm, LoginForm
 from django.utils import timezone
 
@@ -108,3 +108,22 @@ def cancel_appointment(request, appointment_id):
     appointment.schedule.save()
     messages.info(request, "Запись отменена.")
     return redirect('my_appointments')
+
+@login_required
+def doctor_dashboard(request):
+    # Получаем ВСЕ профили врачей для этого пользователя
+    doctors = Doctor.objects.filter(user=request.user)
+    
+    if not doctors.exists():
+        messages.error(request, "У вас нет доступа к кабинету врача.")
+        return redirect('schedule')
+    
+    # Получаем все записи ко всем специализациям этого врача
+    appointments = Appointment.objects.filter(
+        schedule__doctor__in=doctors
+    ).select_related('schedule', 'patient').order_by('-schedule__date', '-schedule__time')
+
+    return render(request, 'doctor_dashboard.html', {
+        'appointments': appointments,
+        'doctors': doctors,
+    })

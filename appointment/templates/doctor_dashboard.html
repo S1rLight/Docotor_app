@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Кабинет врача{% if doctor %} — {{ doctor.name }}{% endif %}{% endblock %}
+
+{% block content %}
+<section class="dashboard page-shell">
+  <div class="dashboard-heading">
+    <div>
+      <p class="eyebrow">КАБИНЕТ СПЕЦИАЛИСТА</p>
+      <h1>Мои пациенты<span>.</span></h1>
+      
+      {% if doctors %}
+        {% if doctors|length > 1 %}
+          <p style="margin-bottom: 10px;">Доступные профили:</p>
+          <div style="margin-bottom: 15px;">
+            {% for d in doctors %}
+              <span style="display: inline-block; margin: 3px 8px 3px 0; padding: 6px 12px; background: #e2f7ec; color: #08734e; border-radius: 6px; font-size: 0.9em; font-weight: 500;">
+                {{ d.name }} <span style="opacity: 0.7;">({{ d.specialization }})</span>
+              </span>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p>Доктор: <strong>{{ doctor.name }}</strong> <span style="color: #666;">({{ doctor.specialization }})</span></p>
+        {% endif %}
+      {% endif %}
+      
+    </div>
+  </div>
+
+  {% if appointments %}
+    <div class="appointment-list">
+    {% for a in appointments %}
+      <article class="my-appointment-card {% if a.status == 'cancelled' or a.status == 'completed' %}is-cancelled{% endif %}">
+        
+        <!-- Дата и время -->
+        <div class="date-tile">
+          <span>{{ a.schedule.date|date:'d' }}</span>
+          <small>{{ a.schedule.date|date:'M' }}</small>
+        </div>
+        
+        <!-- Информация о пациенте и специализации -->
+        <div class="my-appointment-main">
+          <span class="doctor-specialty">{{ a.schedule.doctor.specialization }}</span>
+          <h2>{{ a.patient.get_full_name|default:a.patient.username }}</h2>
+          <div class="appointment-meta inline-meta">
+            <span><i class="bi bi-calendar3"></i> {{ a.schedule.date|date:'d.m.Y' }}</span>
+            <span><i class="bi bi-clock"></i> {{ a.schedule.time|time:'H:i' }}</span>
+          </div>
+        </div>
+        
+        <!-- Статус записи -->
+        <div class="appointment-controls">
+          {% if a.status == 'pending' %}
+            <span class="status-pill status-pending">
+              <i class="bi bi-hourglass-split"></i> Ожидает
+            </span>
+          {% elif a.status == 'confirmed' %}
+            <span class="status-pill status-confirmed">
+              <i class="bi bi-check-circle"></i> Подтверждена
+            </span>
+          {% elif a.status == 'completed' %}
+            <span class="status-pill" style="background:#e2f7ec; color:#08734e;">
+              <i class="bi bi-check2-circle"></i> Завершена
+            </span>
+          {% elif a.status == 'cancelled' %}
+            <span class="status-pill status-cancelled">
+              <i class="bi bi-x-circle"></i> Отменена
+            </span>
+          {% endif %}
+        </div>
+      </article>
+    {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state dashboard-empty">
+      <span class="empty-icon"><i class="bi bi-calendar2-heart"></i></span>
+      <h2>На ближайшее время записей нет</h2>
+      <p>Отдыхайте, доктор!</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
